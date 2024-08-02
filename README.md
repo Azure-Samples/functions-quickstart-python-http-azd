@@ -1,104 +1,76 @@
-# Quickstart: Create a Python function in Azure with Azure Developer CLI
+---
+name: "Azure Functions Python HTTP Trigger using AZD"
+description: This repository contains a Azure Functions HTTP trigger quickstart written in Python and deployed to Azure using Azure Developer CLI (AZD). This sample uses manaaged identity and a virtual network to insure it is secure by default.
+page_type: sample
+languages:
+- Python
+products:
+- azure
+- azure-functions
+- entra-id
+urlFragment: functions-quickstart-python-azd
+---
 
-In this article, you use Azure Developer command-line tools to create a Python function that responds to HTTP requests. After testing the code locally, you deploy it to the serverless environment of Azure Functions. 
+# Azure Functions Python HTTP Trigger using AZD
 
-This article uses the Python v2 programming model for Azure Functions, which provides a decorator-based approach for creating functions. To learn more about the Python v2 programming model, see the [Developer Reference Guide](functions-reference-python.md?pivots=python-mode-decorators)
+This repository contains a Azure Functions HTTP trigger quickstart written in Python and deployed to Azure using Azure Developer CLI (AZD). This sample uses manaaged identity and a virtual network to insure it is secure by default. 
 
-Completing this quickstart incurs a small cost of a few USD cents or less in your Azure account.
+## Getting Started
 
-There's also a [Visual Studio Code-based version](create-first-function-vs-code-python.md) of this article.
+### Prerequisites
 
-## Configure your local environment
+1) [Python 3.11](https://www.python.org/) 
+2) [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local?tabs=v4%2Cmacos%2Ccsharp%2Cportal%2Cbash#install-the-azure-functions-core-tools)
+3) [Azure Developer CLI (AZD)](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd)
+4) [Visual Studio Code](https://code.visualstudio.com/) - Only required if using VS Code to run locally
 
-Before you begin, you must have the following requirements in place:
-
-+ An Azure account with an active subscription. [Create an account for free](https://azure.microsoft.com/free/?ref=microsoft.com&utm_source=microsoft.com&utm_medium=docs&utm_campaign=visualstudio).
-
-+ One of the following tools for creating Azure resources:
-
-  + [Azure CLI](/cli/azure/install-azure-cli) version 2.4 or later.
-
-  + The Azure [Az PowerShell module](/powershell/azure/install-azure-powershell) version 5.9.0 or later.
-
-+ [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd)
-
-+ [A Python version supported by Azure Functions](supported-languages.md#languages-by-runtime-version).
-
-+ The [Azurite storage emulator](../storage/common/storage-use-azurite.md?tabs=npm#install-azurite). While you can also use an actual Azure Storage account, the article assumes you're using this emulator.
-
-## Install the Azure Functions Core Tools
-
-* Embed from existing documentation
-
-## Create and activate a virtual environment
-
-In a suitable folder, run the following commands to create and activate a virtual environment named `.venv`. Make sure that you're using a [version of Python supported by Azure Functions](supported-languages.md?pivots=programming-language-python#languages-by-runtime-version).
-
-* Embed from existing documentation
-
-## Create a local function
-
-In Azure Functions, a function project is a container for one or more individual functions that each responds to a specific trigger. All functions in a project share the same local and hosting configurations. 
- 
-In this section, you create a function project and add an HTTP triggered function.
-
-1. Run the [`func init`](functions-core-tools-reference.md#func-init) command as follows to create a Python v2 functions project in the virtual environment.
-
-    ```console
-    func init --python
-    ```
-
-    The environment now contains various files for the project, including configuration files named [*local.settings.json*](functions-develop-local.md#local-settings-file) and [*host.json*](functions-host-json.md). Because *local.settings.json* can contain secrets downloaded from Azure, the file is excluded from source control by default in the *.gitignore* file.
-
-1. Add a function to your project by using the following command, where the `--name` argument is the unique name of your function (HttpExample) and the `--template` argument specifies the function's trigger (HTTP).
-
-    ```console
-    func new --name HttpExample --template "HTTP trigger" --authlevel "anonymous"
-    ```
-
-    If prompted, choose the **ANONYMOUS** option. [`func new`](functions-core-tools-reference.md#func-new) adds an HTTP trigger endpoint named `HttpExample` to the `function_app.py` file, which is accessible without authentication. 
-
-## Run the function locally
-
-* Embed from existing documentation
-
-## Install Azure Developer CLI
-
-* Embed from existing documentation (https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd)
-
-## Deploy the Azure Function to Azure
-
-To deploy the function to Azure, use the commands:
-
-```
-azd auth login
+### Get repo on your local machine
+Run the following GIT command to clone this repository to your local machine.
+```bash
+git clone https://github.com/Azure-Samples/functions-quickstart-python-azd.git
 ```
 
-Run the azd up command. This will deploy your Function application and create additional resources for your app in Azure. By using the referenced bicep templates, your project will be secure by default.
+## Run on your local environment
 
+### Prepare your local environment
+1) Add a file named local.settings.json file to the root of the project with the following contents. This will allow you to run your function locally.
+```json
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "python"
+  }
+}
 ```
+
+### Using Functions CLI
+1) Open this folder in a new terminal and run the following commands:
+
+```bash
+npm install
+func start
+```
+
+2) Test the HTTP GET trigger using the browser to open http://localhost:7071/api/httpGetFunction
+
+3) Test the HTTP POST trigger in a new terminal window:
+```bash
+curl -i -X POST http://localhost:7071/api/http_post -H "Content-Type: text/json" --data-binary "@src/functions/testdata.json"
+```
+
+### Using Visual Studio Code
+1) Open this folder in a new terminal
+2) Open VS Code by entering `code .` in the terminal
+3) Press Run/Debug (F5) to run in the debugger (select "Debug anyway" if prompted about local emulater not running) 
+4) Insure your favorite REST clientextension is installed (e.g. [RestClient in VS Code](https://marketplace.visualstudio.com/items?itemName=humao.rest-client), PostMan, etc.)
+5) Open the file src/functions/test/ which contains a GET and POST test
+6) Click the "Send Request" link for each and see the results in the right-hand pane that opens
+
+## Deploy to Azure
+
+To provision the dependent resources and deploy the Function app run the following command:
+```bash
 azd up
 ```
-
-Parameter	Description
-* Azure Location: The Azure location where your resources will be deployed.
-* Azure Subscription: The Azure Subscription where your resources will be deployed.
-
-Select your desired values and press enter. The azd up command handles the following tasks for you using the template configuration and infrastructure files:
-
-* Creates and configures all necessary Azure resources (azd provision), including:
-* Access policies and roles for your account
-* Service-to-service communication with Managed Identities
-* Packages and deploys the code (azd deploy)
-
-When the azd up command completes successfully, the CLI displays links to view resources created. You can call azd up as many times as you like to both provision and deploy updates to your application.
-
-## Invoke the function on Azure
-
-Because your function uses an HTTP trigger, you invoke it by making an HTTP request to its URL in the browser or with a tool like curl. 
-
-* Embed from existing documentation
-
-## Clean up resources
-
-* Embed from existing documentation
+You will be prompted for an environment name (this is a friendly name for storing AZD parameters), a Azure subscription, and an Aure location.
