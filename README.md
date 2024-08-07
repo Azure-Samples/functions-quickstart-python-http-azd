@@ -44,11 +44,19 @@ git clone https://github.com/Azure-Samples/functions-quickstart-python-azd.git
 }
 ```
 
+### Create a virtual environment
+1) Open the terminal, navigate to the project folder, and run the following commands:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
 ### Using Functions CLI
 1) Open this folder in a new terminal and run the following commands:
 
 ```bash
-npm install
+pip install -r requirements.txt
 func start
 ```
 
