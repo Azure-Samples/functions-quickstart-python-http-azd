@@ -67,6 +67,50 @@ curl -i -X POST http://localhost:7071/api/http_post -H "Content-Type: text/json"
 5) Open the file src/functions/test/ which contains a GET and POST test
 6) Click the "Send Request" link for each and see the results in the right-hand pane that opens
 
+## Source Code
+
+The key code that makes tthese functions work is in `function_app.py`.  The function is identified as an Azure Function by use of the `@azure/functions` library. This code shows a HTTP GET triggered function.  
+
+```python
+@app.route(route="http_get", methods=["GET"])
+def http_get(req: func.HttpRequest) -> func.HttpResponse:
+    name = req.params.get("name")
+    
+    logging.info(f"Processing GET request. Name: {name}")
+
+    if name:
+        return func.HttpResponse(f"Hello, {name}!")
+    else:
+        return func.HttpResponse(
+            "Please pass a 'name' parameter in the query string",
+            status_code=400
+        )
+```
+This code shows a HTTP POST triggered function.
+
+```python
+@app.route(route="http_post", methods=["POST"])
+def http_post(req: func.HttpRequest) -> func.HttpResponse:
+    try:
+        req_body = req.get_json()
+        name = req_body.get('name')
+        
+        logging.info(f"Processing POST request. Name: {name}")
+
+        if name:
+            return func.HttpResponse(f"Hello, {name}!")
+        else:
+            return func.HttpResponse(
+                "Please pass a 'name' in the request body",
+                status_code=400
+            )
+    except ValueError:
+        return func.HttpResponse(
+            "Invalid JSON in request body",
+            status_code=400
+        )
+```
+
 ## Deploy to Azure
 
 To provision the dependent resources and deploy the Function app run the following command:
