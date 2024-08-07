@@ -2,7 +2,7 @@ import azure.functions as func
 import logging
 import time
 
-app = func.FunctionApp()
+app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 @app.function_name(name="http_get")
 @app.route(route="http_get")
