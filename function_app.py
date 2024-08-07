@@ -1,16 +1,39 @@
 import azure.functions as func
 import logging
-import time
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
-@app.route(route="http_get")
-def main(req: func.HttpRequest) -> func.HttpResponse:
-    user = req.params.get("user")
-    return f"Hello, {user}!"
+@app.route(route="http_get", methods=["GET"])
+def http_get(req: func.HttpRequest) -> func.HttpResponse:
+    name = req.params.get("name")
+    
+    logging.info(f"Processing GET request. Name: {name}")
 
-@app.route(route="http_post")
-def main(req: func.HttpRequest) -> func.HttpResponse:
-    req_body = req.get_json()
-    name = req_body.get('name')
-    return func.HttpResponse(f"Hello, {name}!")
+    if name:
+        return func.HttpResponse(f"Hello, {name}!")
+    else:
+        return func.HttpResponse(
+            "Please pass a 'name' parameter in the query string",
+            status_code=400
+        )
+
+@app.route(route="http_post", methods=["POST"])
+def http_post(req: func.HttpRequest) -> func.HttpResponse:
+    try:
+        req_body = req.get_json()
+        name = req_body.get('name')
+        
+        logging.info(f"Processing POST request. Name: {name}")
+
+        if name:
+            return func.HttpResponse(f"Hello, {name}!")
+        else:
+            return func.HttpResponse(
+                "Please pass a 'name' in the request body",
+                status_code=400
+            )
+    except ValueError:
+        return func.HttpResponse(
+            "Invalid JSON in request body",
+            status_code=400
+        )
