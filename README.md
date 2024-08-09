@@ -60,11 +60,11 @@ pip install -r requirements.txt
 func start
 ```
 
-2) Test the HTTP GET trigger using the browser to open http://localhost:7071/api/httpGetFunction
+2) Test the HTTP GET trigger using the browser to open [http://localhost:7071/api/httpGetFunction](http://localhost:7071/api/http_get)
 
 3) Test the HTTP POST trigger in a new terminal window:
 ```bash
-curl -i -X POST http://localhost:7071/api/http_post -H "Content-Type: text/json" --data-binary "@src/functions/testdata.json"
+curl -i -X POST http://localhost:7071/api/http_post -H "Content-Type: text/json" -d '{"name":"yourname"}'"
 ```
 
 ### Using Visual Studio Code
@@ -125,4 +125,4 @@ To provision the dependent resources and deploy the Function app run the followi
 ```bash
 azd up
 ```
-You will be prompted for an environment name (this is a friendly name for storing AZD parameters), a Azure subscription, and an Aure location.
+You will be prompted for an environment name (this is a friendly name for storing AZD parameters), a Azure subscription, and an Azure location.
