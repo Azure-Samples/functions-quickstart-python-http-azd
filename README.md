@@ -64,7 +64,7 @@ func start
 
 3) Test the HTTP POST trigger in a new terminal window:
 ```bash
-curl -i -X POST http://localhost:7071/api/http_post -H "Content-Type: text/json" -d '{"name":"yourname"}'"
+curl -i -X POST http://localhost:7071/api/http_post -H "Content-Type: text/json" -d '{"name":"yourname"}'
 ```
 
 ### Using Visual Studio Code
