@@ -5,17 +5,11 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 @app.route(route="httpget", methods=["GET"])
 def http_get(req: func.HttpRequest) -> func.HttpResponse:
-    name = req.params.get("name")
-    
+    name = req.params.get("name", "World")
+
     logging.info(f"Processing GET request. Name: {name}")
 
-    if name:
-        return func.HttpResponse(f"Hello, {name}!")
-    else:
-        return func.HttpResponse(
-            "Please pass a 'name' parameter in the query string",
-            status_code=400
-        )
+    return func.HttpResponse(f"Hello, {name}!")
 
 @app.route(route="httppost", methods=["POST"])
 def http_post(req: func.HttpRequest) -> func.HttpResponse:

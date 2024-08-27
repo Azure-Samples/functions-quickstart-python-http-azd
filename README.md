@@ -60,11 +60,11 @@ pip install -r requirements.txt
 func start
 ```
 
-2) Test the HTTP GET trigger using the browser to open [http://localhost:7071/api/httpGetFunction](http://localhost:7071/api/http_get)
+2) Test the HTTP GET trigger using the browser to open [http://localhost:7071/api/http_get](http://localhost:7071/api/http_get)
 
 3) Test the HTTP POST trigger in a new terminal window:
 ```bash
-curl -i -X POST http://localhost:7071/api/http_post -H "Content-Type: text/json" -d '{"name":"yourname"}'"
+curl -i -X POST http://localhost:7071/api/http_post -H "Content-Type: text/json" -d '{"name":"yourname"}'
 ```
 
 ### Using Visual Studio Code
@@ -82,17 +82,11 @@ The key code that makes tthese functions work is in `function_app.py`.  The func
 ```python
 @app.route(route="http_get", methods=["GET"])
 def http_get(req: func.HttpRequest) -> func.HttpResponse:
-    name = req.params.get("name")
-    
+    name = req.params.get("name", "World")
+
     logging.info(f"Processing GET request. Name: {name}")
 
-    if name:
-        return func.HttpResponse(f"Hello, {name}!")
-    else:
-        return func.HttpResponse(
-            "Please pass a 'name' parameter in the query string",
-            status_code=400
-        )
+    return func.HttpResponse(f"Hello, {name}!")
 ```
 This code shows a HTTP POST triggered function.
 
