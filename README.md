@@ -50,19 +50,19 @@ Open the terminal, navigate to the project folder, and run the following command
 #### bash
 ```bash
 python -m venv .venv
-source .venv/scripts/activate
+source .venv/bin/activate
 ```
 
 #### PowerShell
 ```powershell
 py -m venv .venv
-.venv\scripts\activate
+.venv/scripts/activate
 ```
 
 #### Cmd
 ```cmd
 py -m venv .venv
-.venv\scripts\activate
+.venv/scripts/activate
 ```
 
 ### Using Functions CLI
