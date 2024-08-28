@@ -92,7 +92,7 @@ py -m venv .venv
 
 2. From your HTTP test tool in a new terminal (or from your browser), call the HTTP GET endpoint: <http://localhost:7071/api/httpget>
 
-3. Test the HTTP POST trigger with a payload using your favorite secure HTTP test tool. This is an example that uses the `curl` tool with the `testdata.json` project file:
+3. Test the HTTP POST trigger with a payload using your favorite secure HTTP test tool. This is an example that uses the `curl` tool with the [`testdata.json`](./testdata.json) project file:
 
     ```bash
     curl -i http://localhost:7071/api/httppost -H "Content-Type: text/json" -d @testdata.json
@@ -103,7 +103,7 @@ py -m venv .venv
 1. Open the root folder in a new terminal.
 1. Run the `code .` code command to open the project in Visual Studio Code.
 1. Press **Run/Debug (F5)** to run in the debugger. Select **Debug anyway** if prompted about local emulator not running.
-1. Send GET and POST requests to the `httpget` and `httppost` endpoints respectively using your HTTP test tool (or browser for `httpget`). If you have the [RestClient](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension installed, you can execute requests directly from the `test.http` project file.
+1. Send GET and POST requests to the `httpget` and `httppost` endpoints respectively using your HTTP test tool (or browser for `httpget`). If you have the [RestClient](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension installed, you can execute requests directly from the [`test.http`](./scripts/test.http) project file.
 
 ## Source Code
 
