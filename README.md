@@ -34,13 +34,6 @@ You can download this project template in one of these ways:
     azd init --template functions-quickstart-python-http-azd
     ```
 
-+ Clone this repository locally using the `git clone` command:
-
-    ```bash
-    git clone https://github.com/Azure-Samples/functions-quickstart-python-azd.git
-    cd functions-quickstart-python-azd
-    ```
-
 + Fork this repository to your GitHub account and then clone locally using the `git clone` command:
 
     ```bash
@@ -86,7 +79,7 @@ py -m venv .venv
 1. Run these commands in the virtual environment:
 
     ```bash
-    pip install -r requirements.txt
+    pip3 install -r requirements.txt
     func start
     ```
 
