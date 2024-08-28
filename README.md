@@ -1,6 +1,6 @@
 ---
 name: "Azure Functions Python HTTP Trigger using AZD"
-description: This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure Functions Flex Consumption using the Azure Developer CLI (AZD). This sample uses managed identity and a virtual network to insure it is secure by default.
+description: This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure Functions Flex Consumption using the Azure Developer CLI (AZD). This sample uses managed identity and a virtual network to insure it's secure by default.
 page_type: sample
 languages:
 - Python
@@ -13,74 +13,97 @@ urlFragment: functions-quickstart-python-azd
 
 # Azure Functions Python HTTP Trigger using AZD
 
-This repository contains a Azure Functions HTTP trigger quickstart written in Python and deployed to Azure using Azure Developer CLI (AZD). This sample uses managed identity and a virtual network to insure it is secure by default. 
+This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure using Azure Developer CLI (AZD). This sample uses managed identity and a virtual network to insure it's secure by default. 
 
-## Getting Started
+## Prerequisites
 
-### Prerequisites
-
-1) [Python 3.11](https://www.python.org/) 
-2) [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local?tabs=v4%2Cmacos%2Ccsharp%2Cportal%2Cbash#install-the-azure-functions-core-tools)
-3) [Azure Developer CLI (AZD)](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd)
-4) [Visual Studio Code](https://code.visualstudio.com/) - Only required if using VS Code to run locally
++ [Python 3.11](https://www.python.org/)
++ [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools)
++ [Azure Developer CLI (AZD)](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd)
++ To use Visual Studio Code to run and debug locally:
+  + [Visual Studio Code](https://code.visualstudio.com/) 
+  + [Azure Functions extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
 
 ### Get repo on your local machine
-Run the following GIT command to clone this repository to your local machine.
-```bash
-git clone https://github.com/Azure-Samples/functions-quickstart-python-azd.git
-```
 
-## Run on your local environment
+You can download this project template in one of these ways:
 
-### Prepare your local environment
-1) Add a file named local.settings.json file to the root of the project with the following contents. This will allow you to run your function locally.
++ Use this `azd init` command from an empty local (root) folder:
+
+    ```azd
+    azd init --template functions-quickstart-python-http-azd
+    ```
+
++ Fork this repository to your GitHub account and then clone locally using the `git clone` command:
+
+    ```bash
+    git clone https://github.com/<YOUR_ACCOUNT>/functions-quickstart-python-azd.git
+    cd functions-quickstart-python-azd
+    ```
+
+## Prepare your local environment
+
+Add a file named `local.settings.json` in the root of your project with the following contents:
+
 ```json
 {
-  "IsEncrypted": false,
-  "Values": {
+    "IsEncrypted": false,
+    "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "python"
-  }
+    }
 }
 ```
 
-### Create a virtual environment
-1) Open the terminal, navigate to the project folder, and run the following commands:
+## Create a virtual environment
+
+The way that you create your virtual environment depends on your operating system.
+Open the terminal, navigate to the project folder, and run these commands:
+
+### Linux/macOs
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 ```
 
-### Using Functions CLI
-1) Open this folder in a new terminal and run the following commands:
+#### Windows
 
-```bash
-pip install -r requirements.txt
-func start
+```shell
+py -m venv .venv
+.venv\scripts\activate
 ```
 
-2) Test the HTTP GET trigger using the browser to open [http://localhost:7071/api/http_get](http://localhost:7071/api/http_get)
+## Run your app from the terminal
 
-3) Test the HTTP POST trigger in a new terminal window:
-```bash
-curl -i -X POST http://localhost:7071/api/http_post -H "Content-Type: text/json" -d '{"name":"yourname"}'
-```
+1. Run these commands in the virtual environment:
 
-### Using Visual Studio Code
-1) Open this folder in a new terminal
-2) Open VS Code by entering `code .` in the terminal
-3) Press Run/Debug (F5) to run in the debugger (select "Debug anyway" if prompted about local emulater not running) 
-4) Insure your favorite REST clientextension is installed (e.g. [RestClient in VS Code](https://marketplace.visualstudio.com/items?itemName=humao.rest-client), PostMan, etc.)
-5) Open the file src/functions/test/ which contains a GET and POST test
-6) Click the "Send Request" link for each and see the results in the right-hand pane that opens
+    ```bash
+    pip3 install -r requirements.txt
+    func start
+    ```
+
+2. From your HTTP test tool in a new terminal (or from your browser), call the HTTP GET endpoint: <http://localhost:7071/api/httpget>
+
+3. Test the HTTP POST trigger with a payload using your favorite secure HTTP test tool. This is an example that uses the `curl` tool with the [`testdata.json`](./testdata.json) project file:
+
+    ```bash
+    curl -i http://localhost:7071/api/httppost -H "Content-Type: text/json" -d @testdata.json
+    ```
+
+## Run your app using Visual Studio Code
+
+1. Open the root folder in a new terminal.
+1. Run the `code .` code command to open the project in Visual Studio Code.
+1. Press **Run/Debug (F5)** to run in the debugger. Select **Debug anyway** if prompted about local emulator not running.
+1. Send GET and POST requests to the `httpget` and `httppost` endpoints respectively using your HTTP test tool (or browser for `httpget`). If you have the [RestClient](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension installed, you can execute requests directly from the [`test.http`](./scripts/test.http) project file.
 
 ## Source Code
 
-The key code that makes tthese functions work is in `function_app.py`.  The function is identified as an Azure Function by use of the `@azure/functions` library. This code shows a HTTP GET triggered function.  
+The source code for both functions is in `function_app.py` code file. The function is identified as an Azure Function by use of the `@azure/functions` library. This code shows an HTTP GET triggered function.  
 
 ```python
-@app.route(route="http_get", methods=["GET"])
+@app.route(route="httpget", methods=["GET"])
 def http_get(req: func.HttpRequest) -> func.HttpResponse:
     name = req.params.get("name", "World")
 
@@ -88,22 +111,24 @@ def http_get(req: func.HttpRequest) -> func.HttpResponse:
 
     return func.HttpResponse(f"Hello, {name}!")
 ```
-This code shows a HTTP POST triggered function.
+
+This code shows an HTTP POST triggered function.
 
 ```python
-@app.route(route="http_post", methods=["POST"])
+@app.route(route="httppost", methods=["POST"])
 def http_post(req: func.HttpRequest) -> func.HttpResponse:
     try:
         req_body = req.get_json()
         name = req_body.get('name')
+        age = req_body.get('age')
         
         logging.info(f"Processing POST request. Name: {name}")
 
-        if name:
-            return func.HttpResponse(f"Hello, {name}!")
+        if name and isinstance(name, str) and age and isinstance(age, int):
+            return func.HttpResponse(f"Hello, {name}! You are {age} years old!")
         else:
             return func.HttpResponse(
-                "Please pass a 'name' in the request body",
+                "Please provide both 'name' and 'age' in the request body.",
                 status_code=400
             )
     except ValueError:
@@ -116,7 +141,9 @@ def http_post(req: func.HttpRequest) -> func.HttpResponse:
 ## Deploy to Azure
 
 To provision the dependent resources and deploy the Function app run the following command:
+
 ```bash
 azd up
 ```
-You will be prompted for an environment name (this is a friendly name for storing AZD parameters), a Azure subscription, and an Azure location.
+
+You'll be prompted for an environment name (this is a friendly name for storing AZD parameters), an Azure subscription, and an Azure location.
