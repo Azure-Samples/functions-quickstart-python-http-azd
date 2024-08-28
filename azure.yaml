@@ -2,7 +2,7 @@
 
 name: functions-quickstart-python-azd
 metadata:
-  template: functions-quickstart-python-azd@0.0.2-beta
+  template: functions-quickstart-python-azd@1.0.0
 services:
   processor:
     project: .

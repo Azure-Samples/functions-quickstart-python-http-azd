@@ -45,35 +45,51 @@ git clone https://github.com/Azure-Samples/functions-quickstart-python-azd.git
 ```
 
 ### Create a virtual environment
-1) Open the terminal, navigate to the project folder, and run the following commands:
+Open the terminal, navigate to the project folder, and run the following commands:
 
+#### bash
 ```bash
 python -m venv .venv
-source .venv/bin/activate
+source .venv/scripts/activate
+```
+
+#### PowerShell
+```powershell
+py -m venv .venv
+.venv\scripts\activate
+```
+
+#### Cmd
+```cmd
+py -m venv .venv
+.venv\scripts\activate
 ```
 
 ### Using Functions CLI
+
 1) Open this folder in a new terminal and run the following commands:
 
-```bash
-pip install -r requirements.txt
-func start
-```
+    ```bash
+    pip install -r requirements.txt
+    func start
+    ```
 
-2) Test the HTTP GET trigger using the browser to open [http://localhost:7071/api/http_get](http://localhost:7071/api/http_get)
+2) Test the HTTP GET trigger using the browser to open http://localhost:7071/api/httpget
 
-3) Test the HTTP POST trigger in a new terminal window:
-```bash
-curl -i -X POST http://localhost:7071/api/http_post -H "Content-Type: text/json" -d '{"name":"yourname"}'
-```
+3) Test the HTTP POST trigger using your favorite REST client (e.g. [RestClient in VS Code](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)). `test.http` has been provided to run this quickly.
+Or in a new terminal run the following:
+
+    ```bash
+    curl -i -X POST http://localhost:7071/api/httppost -H "Content-Type: text/json" -d "{\"name\": \"Awesome Developer\", \"age\": \"25\"}"
+    ```
 
 ### Using Visual Studio Code
+
 1) Open this folder in a new terminal
 2) Open VS Code by entering `code .` in the terminal
-3) Press Run/Debug (F5) to run in the debugger (select "Debug anyway" if prompted about local emulater not running) 
-4) Insure your favorite REST clientextension is installed (e.g. [RestClient in VS Code](https://marketplace.visualstudio.com/items?itemName=humao.rest-client), PostMan, etc.)
-5) Open the file src/functions/test/ which contains a GET and POST test
-6) Click the "Send Request" link for each and see the results in the right-hand pane that opens
+3) Make sure the [Azure Functions extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) is installed
+4) Press Run/Debug (F5) to run in the debugger (select "Debug anyway" if prompted about local emulater not running) 
+5) Use same approach above to test using an HTTP REST client
 
 ## Source Code
 
