@@ -1,4 +1,8 @@
-GET http://localhost:7071/api/httpget?name=World HTTP/1.1
+GET http://localhost:7071/api/httpget HTTP/1.1
+
+###
+
+GET http://localhost:7071/api/httpget?name=Awesome%20Developer HTTP/1.1
 
 ###
 
