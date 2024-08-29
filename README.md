@@ -1,9 +1,11 @@
 ---
-name: "Azure Functions Python HTTP Trigger using AZD"
-description: This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure Functions Flex Consumption using the Azure Developer CLI (AZD). This sample uses managed identity and a virtual network to insure it's secure by default.
+name: Azure Functions Python HTTP Trigger using azd
+description: This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure Functions Flex Consumption using the Azure Developer CLI (azd). This sample uses managed identity and a virtual network to make sure it's secure by default.
 page_type: sample
 languages:
-- Python
+- azdeveloper
+- python
+- bicep
 products:
 - azure
 - azure-functions
@@ -13,7 +15,7 @@ urlFragment: functions-quickstart-python-azd
 
 # Azure Functions Python HTTP Trigger using AZD
 
-This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure using Azure Developer CLI (AZD). This sample uses managed identity and a virtual network to insure it's secure by default. 
+This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure using Azure Developer CLI (AZD). This sample uses managed identity and a virtual network to insure it's secure by default.
 
 ## Prerequisites
 
@@ -24,19 +26,21 @@ This repository contains an Azure Functions HTTP trigger quickstart written in P
   + [Visual Studio Code](https://code.visualstudio.com/) 
   + [Azure Functions extension](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
 
-### Get repo on your local machine
+## Initialize the local project
 
-You can download this project template in one of these ways:
+You can initialize a project from this `azd` template in one of these ways:
 
 + Use this `azd init` command from an empty local (root) folder:
 
-    ```azd
+    ```shell
     azd init --template functions-quickstart-python-http-azd
     ```
 
+    Supply an environment name, such as `flexquickstart` when prompted. In `azd`, the environment is used to maintain a unique deployment context for your app.
+
 + Fork this repository to your GitHub account and then clone locally using the `git clone` command:
 
-    ```bash
+    ```shell
     git clone https://github.com/<YOUR_ACCOUNT>/functions-quickstart-python-azd.git
     cd functions-quickstart-python-azd
     ```
@@ -60,7 +64,7 @@ Add a file named `local.settings.json` in the root of your project with the foll
 The way that you create your virtual environment depends on your operating system.
 Open the terminal, navigate to the project folder, and run these commands:
 
-### Linux/macOs
+### Linux/macOS
 
 ```bash
 python -m venv .venv
@@ -78,16 +82,16 @@ py -m venv .venv
 
 1. Run these commands in the virtual environment:
 
-    ```bash
+    ```shell
     pip3 install -r requirements.txt
     func start
     ```
 
 2. From your HTTP test tool in a new terminal (or from your browser), call the HTTP GET endpoint: <http://localhost:7071/api/httpget>
 
-3. Test the HTTP POST trigger with a payload using your favorite secure HTTP test tool. This is an example that uses the `curl` tool with the [`testdata.json`](./testdata.json) project file:
+3. Test the HTTP POST trigger with a payload using your favorite secure HTTP test tool. This example uses the `curl` tool with payload data from the [`testdata.json`](./testdata.json) project file:
 
-    ```bash
+    ```shell
     curl -i http://localhost:7071/api/httppost -H "Content-Type: text/json" -d @testdata.json
     ```
 
@@ -96,7 +100,7 @@ py -m venv .venv
 1. Open the root folder in a new terminal.
 1. Run the `code .` code command to open the project in Visual Studio Code.
 1. Press **Run/Debug (F5)** to run in the debugger. Select **Debug anyway** if prompted about local emulator not running.
-1. Send GET and POST requests to the `httpget` and `httppost` endpoints respectively using your HTTP test tool (or browser for `httpget`). If you have the [RestClient](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension installed, you can execute requests directly from the [`test.http`](./scripts/test.http) project file.
+1. Send GET and POST requests to the `httpget` and `httppost` endpoints respectively using your HTTP test tool (or browser for `httpget`). If you have the [RestClient](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) extension installed, you can execute requests directly from the [`test.http`](test.http) project file.
 
 ## Source Code
 
@@ -140,10 +144,31 @@ def http_post(req: func.HttpRequest) -> func.HttpResponse:
 
 ## Deploy to Azure
 
-To provision the dependent resources and deploy the Function app run the following command:
+Run this command to provision the function app, with any required Azure resources, and deploy your code:
 
-```bash
+```shell
 azd up
 ```
 
-You'll be prompted for an environment name (this is a friendly name for storing AZD parameters), an Azure subscription, and an Azure location.
+You're prompted to supply these required deployment parameters:
+
+| Parameter | Description |
+| ---- | ---- |
+| _Environment name_ | An environment that's used to maintain a unique deployment context for your app. You won't be prompted if you created the local project using `azd init`.|
+| _Azure subscription_ | Subscription in which your resources are created.|
+| _Azure location_ | Azure region in which to create the resource group that contains the new Azure resources. Only regions that currently support the Flex Consumption plan are shown.|
+
+## Redeploy your code
+
+You can run the `azd up` command as many times as you need to both provision your Azure resources and deploy code updates to your function app. 
+
+>[!NOTE]
+>Deployed code files are always overwritten by the latest deployment package.
+
+## Clean up resources
+
+When you're done working with your function app and related resources, you can use this command to delete the function app and its related resources from Azure and avoid incurring any further costs:
+
+```shell
+azd down
+```
