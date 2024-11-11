@@ -14,9 +14,9 @@ param environmentName string
   }
 })
 param location string
-
-param processorServiceName string = ''
-param processorUserAssignedIdentityName string = ''
+param skipVnet bool = false
+param apiServiceName string = ''
+param apiUserAssignedIdentityName string = ''
 param applicationInsightsName string = ''
 param appServicePlanName string = ''
 param logAnalyticsName string = ''
@@ -28,6 +28,8 @@ param disableLocalAuth bool = true
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var tags = { 'azd-env-name': environmentName }
+var functionAppName = !empty(apiServiceName) ? apiServiceName : '${abbrs.webSitesFunctions}api-${resourceToken}'
+var deploymentStorageContainerName = 'app-package-${take(functionAppName, 32)}-${take(toLower(uniqueString(functionAppName, resourceToken)), 7)}'
 
 // Organize resources in a resource group
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -36,64 +38,18 @@ resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   tags: tags
 }
 
-// User assigned managed identity to be used by the Function App to reach storage and service bus
-module processorUserAssignedIdentity './core/identity/userAssignedIdentity.bicep' = {
-  name: 'processorUserAssignedIdentity'
+// User assigned managed identity to be used by the function app to reach storage
+module apiUserAssignedIdentity './core/identity/userAssignedIdentity.bicep' = {
+  name: 'apiUserAssignedIdentity'
   scope: rg
   params: {
     location: location
     tags: tags
-    identityName: !empty(processorUserAssignedIdentityName) ? processorUserAssignedIdentityName : '${abbrs.managedIdentityUserAssignedIdentities}processor-${resourceToken}'
+    identityName: !empty(apiUserAssignedIdentityName) ? apiUserAssignedIdentityName : '${abbrs.managedIdentityUserAssignedIdentities}api-${resourceToken}'
   }
 }
 
-// The application backend
-module processor './app/processor.bicep' = {
-  name: 'processor'
-  scope: rg
-  params: {
-    name: !empty(processorServiceName) ? processorServiceName : '${abbrs.webSitesFunctions}processor-${resourceToken}'
-    location: location
-    tags: tags
-    applicationInsightsName: monitoring.outputs.applicationInsightsName
-    appServicePlanId: appServicePlan.outputs.id
-    runtimeName: 'python'
-    runtimeVersion: '3.11'
-    storageAccountName: storage.outputs.name
-    identityId: processorUserAssignedIdentity.outputs.identityId
-    identityClientId: processorUserAssignedIdentity.outputs.identityClientId
-    appSettings: {
-    }
-    virtualNetworkSubnetId: serviceVirtualNetwork.outputs.appSubnetID
-  }
-}
-
-// Backing storage for Azure functions processor
-module storage './core/storage/storage-account.bicep' = {
-  name: 'storage'
-  scope: rg
-  params: {
-    name: !empty(storageAccountName) ? storageAccountName : '${abbrs.storageStorageAccounts}${resourceToken}'
-    location: location
-    tags: tags
-    containers: [{name: 'deploymentpackage'}]
-    publicNetworkAccess: 'Disabled'
-  }
-}
-
-var storageRoleDefinitionId  = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' //Storage Blob Data Owner role
-
-// Allow access from processor to storage account using a managed identity
-module storageRoleAssignmentApi 'app/storage-Access.bicep' = {
-  name: 'storageRoleAssignmentPRocessor'
-  scope: rg
-  params: {
-    storageAccountName: storage.outputs.name
-    roleDefinitionID: storageRoleDefinitionId
-    principalID: processorUserAssignedIdentity.outputs.identityPrincipalId
-  }
-}
-
+// The application backend is a function app
 module appServicePlan './core/host/appserviceplan.bicep' = {
   name: 'appserviceplan'
   scope: rg
@@ -108,8 +64,58 @@ module appServicePlan './core/host/appserviceplan.bicep' = {
   }
 }
 
-// Virtual Network & private endpoint
-module serviceVirtualNetwork 'app/vnet.bicep' = {
+module api './app/api.bicep' = {
+  name: 'api'
+  scope: rg
+  params: {
+    name: functionAppName
+    location: location
+    tags: tags
+    applicationInsightsName: monitoring.outputs.applicationInsightsName
+    appServicePlanId: appServicePlan.outputs.id
+    runtimeName: 'python'
+    runtimeVersion: '3.11'
+    storageAccountName: storage.outputs.name
+    deploymentStorageContainerName: deploymentStorageContainerName
+    identityId: apiUserAssignedIdentity.outputs.identityId
+    identityClientId: apiUserAssignedIdentity.outputs.identityClientId
+    appSettings: {
+    }
+    virtualNetworkSubnetId: skipVnet ? '' : serviceVirtualNetwork.outputs.appSubnetID
+  }
+}
+
+// Backing storage for Azure functions api
+module storage './core/storage/storage-account.bicep' = {
+  name: 'storage'
+  scope: rg
+  params: {
+    name: !empty(storageAccountName) ? storageAccountName : '${abbrs.storageStorageAccounts}${resourceToken}'
+    location: location
+    tags: tags
+    containers: [{name: deploymentStorageContainerName}]
+    publicNetworkAccess: skipVnet ? 'Enabled' : 'Disabled'
+    networkAcls: skipVnet ? {} : {
+      defaultAction: 'Deny'
+    }
+  }
+}
+
+var storageRoleDefinitionId  = 'b7e6dc6d-f1e8-4753-8033-0f276bb0955b' //Storage Blob Data Owner role
+
+// Allow access from api to storage account using a managed identity
+module storageRoleAssignmentApi 'app/storage-Access.bicep' = {
+  name: 'storageRoleAssignmentApi'
+  scope: rg
+  params: {
+    storageAccountName: storage.outputs.name
+    roleDefinitionID: storageRoleDefinitionId
+    principalID: apiUserAssignedIdentity.outputs.identityPrincipalId
+  }
+}
+
+// Virtual Network & private endpoint to blob storage
+module serviceVirtualNetwork 'app/vnet.bicep' = if (!skipVnet) {
   name: 'serviceVirtualNetwork'
   scope: rg
   params: {
@@ -119,14 +125,14 @@ module serviceVirtualNetwork 'app/vnet.bicep' = {
   }
 }
 
-module servicePrivateEndpoint 'app/storage-PrivateEndpoint.bicep' = {
-  name: 'servicePrivateEndpoint'
+module storagePrivateEndpoint 'app/storage-PrivateEndpoint.bicep' = if (!skipVnet) {
+  name: 'storagePrivateEndpoint'
   scope: rg
   params: {
     location: location
     tags: tags
     virtualNetworkName: !empty(vNetName) ? vNetName : '${abbrs.networkVirtualNetworks}${resourceToken}'
-    subnetName: serviceVirtualNetwork.outputs.peSubnetName
+    subnetName: skipVnet ? '' : serviceVirtualNetwork.outputs.peSubnetName
     resourceName: storage.outputs.name
   }
 }
@@ -146,14 +152,14 @@ module monitoring './core/monitor/monitoring.bicep' = {
 
 var monitoringRoleDefinitionId = '3913510d-42f4-4e42-8a64-420c390055eb' // Monitoring Metrics Publisher role ID
 
-// Allow access from processor to application insights using a managed identity
+// Allow access from api to application insights using a managed identity
 module appInsightsRoleAssignmentApi './core/monitor/appinsights-access.bicep' = {
-  name: 'appInsightsRoleAssignmentPRocessor'
+  name: 'appInsightsRoleAssignmentApi'
   scope: rg
   params: {
     appInsightsName: monitoring.outputs.applicationInsightsName
     roleDefinitionID: monitoringRoleDefinitionId
-    principalID: processorUserAssignedIdentity.outputs.identityPrincipalId
+    principalID: apiUserAssignedIdentity.outputs.identityPrincipalId
   }
 }
 
@@ -161,5 +167,5 @@ module appInsightsRoleAssignmentApi './core/monitor/appinsights-access.bicep' = 
 output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.applicationInsightsConnectionString
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
-output SERVICE_PROCESSOR_NAME string = processor.outputs.SERVICE_PROCESSOR_NAME
-output AZURE_FUNCTION_NAME string = processor.outputs.SERVICE_PROCESSOR_NAME
+output SERVICE_API_NAME string = api.outputs.SERVICE_API_NAME
+output AZURE_FUNCTION_NAME string = api.outputs.SERVICE_API_NAME

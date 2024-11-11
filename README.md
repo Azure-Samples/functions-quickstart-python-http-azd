@@ -1,7 +1,7 @@
 <!--
 ---
 name: Azure Functions Python HTTP Trigger using Azure Developer CLI
-description: This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure Functions Flex Consumption using the Azure Developer CLI (azd). The sample uses managed identity and a virtual network to make sure deployment is secure by default.
+description: This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure Functions Flex Consumption using the Azure Developer CLI (azd). The sample uses managed identity and a virtual network to make sure deployment is secure by default. You can opt out of a VNet being used in the sample by setting SKIP_VNET to true in the parameters.
 page_type: sample
 languages:
 - azdeveloper
@@ -162,6 +162,13 @@ Run this command to provision the function app, with any required Azure resource
 azd up
 ```
 
+Alternatively, you can opt-out of a VNet being used in the sample. To do so, use `azd env` to configure `SKIP_VNET` to `true` before running `azd up`:
+
+```bash
+azd env set SKIP_VNET true
+azd up
+```
+
 You're prompted to supply these required deployment parameters:
 
 | Parameter | Description |
@@ -174,7 +181,7 @@ To learn how to obtain your new function endpoints in Azure along with the requi
 
 ## Redeploy your code
 
-You can run the `azd up` command as many times as you need to both provision your Azure resources and deploy code updates to your function app. 
+You can run the `azd up` command as many times as you need to both provision your Azure resources and deploy code updates to your function app.
 
 >[!NOTE]
 >Deployed code files are always overwritten by the latest deployment package.
