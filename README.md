@@ -183,12 +183,6 @@ To learn how to obtain your new function endpoints in Azure along with the requi
 
 You can run the `azd up` command as many times as you need to both provision your Azure resources and deploy code updates to your function app.
 
-If you want to create a new environment, run the following command before `azd up`:
-
-```shell
-azd env new
-```
-
 >[!NOTE]
 >Deployed code files are always overwritten by the latest deployment package.
 
