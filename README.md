@@ -45,7 +45,7 @@ You can initialize a project from this `azd` template in one of these ways:
 + Clone the GitHub template repository locally using the `git clone` command:
 
     ```shell
-    git clone https://github.com/Azure-Samples/functions-quickstart-python-azd.git
+    git clone https://github.com/Azure-Samples/functions-quickstart-python-http-azd.git
     cd functions-quickstart-python-azd
     ```
 
