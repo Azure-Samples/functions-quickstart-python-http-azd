@@ -1,7 +1,7 @@
 <!--
 ---
 name: Azure Functions Python HTTP Trigger using Azure Developer CLI
-description: This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure Functions Flex Consumption using the Azure Developer CLI (azd). The sample uses managed identity and a virtual network to make sure deployment is secure by default. You can opt out of a VNet being used in the sample by setting SKIP_VNET to true in the parameters.
+description: This repository contains an Azure Functions HTTP trigger quickstart written in Python and deployed to Azure Functions Flex Consumption using the Azure Developer CLI (azd). The sample uses managed identity and a virtual network to make sure deployment is secure by default. You can opt out of a VNet being used in the sample by setting VNET_ENABLED to false in the parameters.
 page_type: sample
 languages:
 - azdeveloper
@@ -162,10 +162,16 @@ Run this command to provision the function app, with any required Azure resource
 azd up
 ```
 
-Alternatively, you can opt-out of a VNet being used in the sample. To do so, use `azd env` to configure `SKIP_VNET` to `true` before running `azd up`:
+By default, this sample deploys with a virtual network (VNet) for enhanced security, ensuring that the function app and related resources are isolated within a private network. 
+The `VNET_ENABLED` parameter controls whether a VNet is used during deployment:
+- When `VNET_ENABLED` is `true` (default), the function app is deployed with a VNet for secure communication and resource isolation.
+- When `VNET_ENABLED` is `false`, the function app is deployed without a VNet, allowing public access to resources.
 
+This parameter replaces the previous `SKIP_VNET` parameter. If you were using `SKIP_VNET` in earlier versions, set `VNET_ENABLED` to `false` to achieve the same behavior.
+
+To disable the VNet for this sample, set `VNET_ENABLED` to `false` before running `azd up`:
 ```bash
-azd env set SKIP_VNET true
+azd env set VNET_ENABLED false
 azd up
 ```
 
