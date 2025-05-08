@@ -107,7 +107,7 @@ module api './app/api.bicep' = {
     name: functionAppName
     location: location
     tags: tags
-    applicationInsightsName: monitoring.outputs.applicationInsightsName
+    applicationInsightsName: monitoring.outputs.name
     appServicePlanId: appServicePlan.outputs.resourceId
     runtimeName: 'python'
     runtimeVersion: '3.12'
@@ -165,7 +165,7 @@ module rbac 'app/rbac.bicep' = {
   scope: rg
   params: {
     storageAccountName: storage.outputs.name
-    appInsightsName: monitoring.outputs.applicationInsightsName
+    appInsightsName: monitoring.outputs.name
     managedIdentityPrincipalId: apiUserAssignedIdentity.outputs.principalId
     userIdentityPrincipalId: principalId
     enableBlob: storageEndpointConfig.enableBlob
@@ -201,20 +201,32 @@ module storagePrivateEndpoint 'app/storage-PrivateEndpoint.bicep' = if (vnetEnab
   }
 }
 
-// Monitor application with Azure Monitor
-module monitoring 'br/public:avm/ptn/azd/monitoring:0.1.0' = {
-  name: 'monitoring'
+// Monitor application with Azure Monitor - Log Analytics and Application Insights
+module logAnalytics 'br/public:avm/res/operational-insights/workspace:0.7.0' = {
+  name: '${uniqueString(deployment().name, location)}-loganalytics'
   scope: rg
   params: {
-    applicationInsightsName: !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
-    logAnalyticsName: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
+    name: !empty(logAnalyticsName) ? logAnalyticsName : '${abbrs.operationalInsightsWorkspaces}${resourceToken}'
     location: location
     tags: tags
+    dataRetention: 30
+  }
+}
+ 
+module monitoring 'br/public:avm/res/insights/component:0.4.1' = {
+  name: '${uniqueString(deployment().name, location)}-appinsights'
+  scope: rg
+  params: {
+    name: !empty(applicationInsightsName) ? applicationInsightsName : '${abbrs.insightsComponents}${resourceToken}'
+    location: location
+    tags: tags
+    workspaceResourceId: logAnalytics.outputs.resourceId
+    disableLocalAuth: true
   }
 }
 
 // App outputs
-output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.applicationInsightsConnectionString
+output APPLICATIONINSIGHTS_CONNECTION_STRING string = monitoring.outputs.connectionString
 output AZURE_LOCATION string = location
 output AZURE_TENANT_ID string = tenant().tenantId
 output SERVICE_API_NAME string = api.outputs.SERVICE_API_NAME
