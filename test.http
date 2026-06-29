@@ -6,7 +6,7 @@ GET http://localhost:7071/api/httpget?name=World HTTP/1.1
 
 ###
 
-POST http://localhost:7071/api/httppost HTTP/1.1
+POST http://localhost:7071/api/httppost
 content-type: application/json
 
 {

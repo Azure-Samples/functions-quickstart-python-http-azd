@@ -4,7 +4,6 @@ __pycache__/
 *$py.class
 
 # Azure Functions
-local.settings.json
 
 # Distribution / packaging
 .Python

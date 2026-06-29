@@ -24,6 +24,7 @@ This source code supports the article [Quickstart: Create and deploy functions t
 ## Prerequisites
 
 + [Python 3.11](https://www.python.org/)
++ [Azurite](https://learn.microsoft.com/azure/storage/common/storage-use-azurite) (for local storage emulation)
 + [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local?pivots=programming-language-python#install-the-azure-functions-core-tools)
 + [Azure Developer CLI (AZD)](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd)
 + To use Visual Studio Code to run and debug locally:
@@ -46,24 +47,15 @@ You can initialize a project from this `azd` template in one of these ways:
 
     ```shell
     git clone https://github.com/Azure-Samples/functions-quickstart-python-http-azd.git
-    cd functions-quickstart-python-azd
+    cd functions-quickstart-python-http-azd
     ```
 
     You can also clone the repository from your own fork in GitHub.
 
-## Prepare your local environment
+## Local settings
 
-Add a file named `local.settings.json` in the root of your project with the following contents:
+The `local.settings.json` file is included in this template with default values for local development. This file is excluded from deployment by `.funcignore`.
 
-```json
-{
-    "IsEncrypted": false,
-    "Values": {
-    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-    "FUNCTIONS_WORKER_RUNTIME": "python"
-    }
-}
-```
 
 ## Create a virtual environment
 
@@ -86,7 +78,13 @@ py -m venv .venv
 
 ## Run your app from the terminal
 
-1. To start the Functions host locally, run these commands in the virtual environment:
+1. Start Azurite for local storage emulation. In a separate terminal, run:
+
+    ```shell
+    azurite
+    ```
+
+1. In your project terminal, start the Functions host:
 
     ```shell
     pip3 install -r requirements.txt
