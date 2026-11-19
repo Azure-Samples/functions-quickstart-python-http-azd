@@ -1,0 +1,10 @@
+# This descriptor drives template package creation in the packaging pipeline.
+schemaVersion: 1
+identity: Azure.Functions.Templates.HttpPython
+description: Create a Python Azure Functions app for HTTP Trigger, with deployment files for azd.
+projects:
+- name: Azure Functions HTTP Trigger (Python)
+  shortName: functions-quickstart-python-http
+  root: .
+  stack: python
+  language: Python
